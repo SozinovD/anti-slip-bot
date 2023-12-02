@@ -1,5 +1,7 @@
-bot_token: ""
-db_filename: "main.db"
-default_send_period_sec: 7200
-sending_loop_timeout_sec: 20
-timezone: 3
+bot:
+  token: ""
+  default_send_period_sec: 7200
+  sending_loop_timeout_sec: 20
+server:
+  timezone: 3
+  db_filename: "main.db"

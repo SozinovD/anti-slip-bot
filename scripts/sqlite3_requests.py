@@ -4,9 +4,10 @@ from tables import tables_arr
 
 import functions as funcs
 
+db_filename = funcs.read_config_file("configs/config.yaml")['server']["db_filename"]
+
 def check_init():
   ''' Connect to db, create if it doesn't exist, return conn obj '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
   except Exception as e:
@@ -23,16 +24,13 @@ def check_init():
 
 def init_db():
   ''' Init db, create tables, input default values '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   print('Init db, filename:\'' + db_filename + '\'')
-
   try:
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
     # create tables
     for table in tables_arr:
       c.execute(table)
-
     # make sure changes are permanent
     conn.commit()
     return True
@@ -44,7 +42,6 @@ def init_db():
 
 def select(table:str, fields:str='*', filters:str=None):
   ''' Make SELECT request to db '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
@@ -62,7 +59,6 @@ def select(table:str, fields:str='*', filters:str=None):
   return result
 
 def count(table:str, fields:str='*', filters:str=None):
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
@@ -81,7 +77,6 @@ def count(table:str, fields:str='*', filters:str=None):
 def add_many_records_to_db(table:str, fields_arr:list):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record
       'fields_arr' is a array of 'fields' arrs '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
 
@@ -117,7 +112,6 @@ def add_many_records_to_db(table:str, fields_arr:list):
 
 def add_record_to_db(table:str, fields: dict):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
     field_names = ''
@@ -151,7 +145,6 @@ def add_record_to_db(table:str, fields: dict):
 
 def del_records_from_db(table:str, filters:dict):
   ''' Delete records from any table in db by filters '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
@@ -169,7 +162,6 @@ def del_records_from_db(table:str, filters:dict):
 
 def update_records_in_db(table:str, new_data:str, filters:str):
   ''' Update records in db by filters '''
-  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     request_template = 'UPDATE {tbl} SET {data} WHERE {fltrs}'
     conn = sqlite3.connect(db_filename)

@@ -23,7 +23,7 @@ class Form(StatesGroup):
 
 config = funcs.read_config_file("configs/config.yaml")
 storage = MemoryStorage()
-bot = Bot(config["bot_token"])
+bot = Bot(config['bot']["token"])
 dp = Dispatcher(bot, storage=storage)
 
 # data_divider_in_callback = "`"
@@ -42,7 +42,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
     ''' Show help msg at start '''
-    db.add_def_settings(message.from_user.id, config['default_send_period_sec'])
+    db.add_def_settings(message.from_user.id, config['server']['default_send_period_sec'])
     db.change_setting(message.from_user.id, 'send_messages', 1)
     await message.answer(funcs.get_help_msg())
 
@@ -113,14 +113,12 @@ def main():
     executor.start_polling(dp)
 
 def sending_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: AsyncIOScheduler):
-    loop.call_later(config['sending_loop_timeout_sec'], sending_loop, loop, scheduler)
+    loop.call_later(config['bot']['sending_loop_timeout_sec'], sending_loop, loop, scheduler)
     active_users = db.get_active_user_ids()
     curr_ts = int(datetime.timestamp(datetime.now()))
-    print(curr_ts)
     for user_id in active_users:
         user_id = user_id[0]
         next_window_start_ts = db.get_next_window_start_ts(user_id)[0][0]
-        print(user_id, next_window_start_ts)
         if next_window_start_ts == 0:
             print('Write new ts:', curr_ts)
             db.change_setting(user_id, 'next_window_start_ts', curr_ts)
@@ -128,9 +126,9 @@ def sending_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: Asy
         if next_window_start_ts < curr_ts:
             next_msg_interval = funcs.get_random_interval(user_id)
             nex_msg_date = datetime.fromtimestamp(curr_ts + next_msg_interval,
-                                                      tz=timezone(timedelta(hours=config['timezone']
+                                                      tz=timezone(timedelta(hours=config['server']['timezone']
                                                                             ))).strftime('%Y-%m-%d %H:%M:%S')
-            print(f'Message will be sent time: {nex_msg_date}')
+            print(f'Message to "{user_id}" will be sent at: {nex_msg_date}')
             scheduler.add_job(send_message, 'date', run_date=nex_msg_date, args=(user_id,))
             db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_curr_settings(user_id)[3]))
 
