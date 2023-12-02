@@ -102,9 +102,9 @@ def send_messages():
   print(active_users)
 
 def get_random_msg(user_id:int):
-  messages = db.get_curr_settings(user_id)[4].split(',')
+  messages = db.get_curr_settings(user_id)['messages'].split(',')
   return str(random.choice(messages)).strip("'")
 
 def get_random_interval(user_id:int):
-  max_interval = db.get_curr_settings(user_id)[3]
+  max_interval = db.get_curr_settings(user_id)['period']
   return int(random.randint(int(max_interval/10), max_interval))

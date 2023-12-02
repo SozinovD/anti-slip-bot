@@ -34,19 +34,25 @@ def get_active_user_ids():
   return db_requests.select('settings', 'user_id', 'send_messages=1')
 
 def get_next_window_start_ts(user_id:int):
-  return db_requests.select('settings', 'next_window_start_ts', f'user_id={user_id}')
+  return db_requests.select('settings', 'next_window_start_ts', f'user_id={user_id}')[0][0]
 
 def get_curr_settings(user_id:int, human_readable:bool = False):
   settings = list(db_requests.select("settings", filters=f"user_id={user_id}")[0])[2:]
+  settings_dict = dict()
+  settings_dict['send_msg'] = settings[0]
+  settings_dict['tz'] = settings[1]
+  settings_dict['worktime'] = settings[2]
+  settings_dict['period'] = settings[3]
+  settings_dict['messages'] = settings[4]
   line = f'''
-- Send messages: {settings[0]}
-- Timezone: {settings[1]}
-- Work time: {settings[2]}
-- Period (minutes): {int(settings[3]/60)}
-- Messages: {settings[4]}
+- Send messages: {settings_dict['send_msg']}
+- Timezone: {settings_dict['tz']}
+- Work time: {settings_dict['worktime']}
+- Period (minutes): {int(settings_dict['period']/60)}
+- Messages: {settings_dict['mesages']}
   '''
   if human_readable: return line
-  else: return settings
+  else: return settings_dict
 
 def add_rec(new_rec:Record):
   ''' Add new record to db, return result '''

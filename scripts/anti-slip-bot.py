@@ -118,7 +118,7 @@ def sending_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: Asy
     curr_ts = int(datetime.timestamp(datetime.now()))
     for user_id in active_users:
         user_id = user_id[0]
-        next_window_start_ts = db.get_next_window_start_ts(user_id)[0][0]
+        next_window_start_ts = db.get_next_window_start_ts(user_id)
         if next_window_start_ts == 0:
             print('Write new ts:', curr_ts)
             db.change_setting(user_id, 'next_window_start_ts', curr_ts)
@@ -130,7 +130,7 @@ def sending_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: Asy
                                                                             ))).strftime('%Y-%m-%d %H:%M:%S')
             print(f'Message to "{user_id}" will be sent at: {nex_msg_date}')
             scheduler.add_job(send_message, 'date', run_date=nex_msg_date, args=(user_id,))
-            db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_curr_settings(user_id)[3]))
+            db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_curr_settings(user_id)['period']))
 
 if __name__ == "__main__":
     main()
