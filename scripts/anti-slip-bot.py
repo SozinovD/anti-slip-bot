@@ -42,7 +42,7 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
     ''' Show help msg at start '''
-    db.add_def_settings(message.from_user.id, config['server']['default_send_period_sec'])
+    db.add_def_settings(message.from_user.id, config['bot']['default_send_period_sec'])
     db.change_setting(message.from_user.id, 'send_messages', 1)
     await message.answer(funcs.get_help_msg())
 
