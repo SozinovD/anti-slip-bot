@@ -23,7 +23,7 @@ def add_def_settings(user_id:int, period_sec:int):
                   ("tz", "6"),
                   ("period_sec", period_sec),
                   ("worktime", "9-23"),
-                  ("messages", "'What are you doing now?'"),
+                  ("messages", "'What are you doing now and how do you feel?'"),
                   ("next_window_start_ts", 0))
   db_requests.add_record_to_db('settings', def_settings)
 
