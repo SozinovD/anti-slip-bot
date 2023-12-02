@@ -5,8 +5,6 @@ from classes import Record
 import time
 from datetime import datetime
 import sqlite3_requests as db_requests
-from tables import tables_arr
-import functions as funcs
 import time
 
 def start():
