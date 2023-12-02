@@ -4,8 +4,9 @@ from tables import tables_arr
 
 import functions as funcs
 
-def check_init(db_filename:str):
+def check_init():
   ''' Connect to db, create if it doesn't exist, return conn obj '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
   except Exception as e:
@@ -15,13 +16,14 @@ def check_init(db_filename:str):
       conn.close()
 
   if os.stat(db_filename).st_size == 0:
-    result = init_db(db_filename)
+    result = init_db()
     return result
 
   return True
 
-def init_db(db_filename:str):
+def init_db():
   ''' Init db, create tables, input default values '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   print('Init db, filename:\'' + db_filename + '\'')
 
   try:
@@ -40,8 +42,9 @@ def init_db(db_filename:str):
     if conn:
       conn.close()
 
-def select(db_filename:str, table:str, fields:str='*', filters:str=None):
+def select(table:str, fields:str='*', filters:str=None):
   ''' Make SELECT request to db '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
@@ -58,9 +61,27 @@ def select(db_filename:str, table:str, fields:str='*', filters:str=None):
       conn.close()
   return result
 
-def add_many_records_to_db(db_filename:str, table:str, fields_arr:list):
+def count(table:str, fields:str='*', filters:str=None):
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
+  try:
+    conn = sqlite3.connect(db_filename)
+    c = conn.cursor()
+    request = 'SELECT COUNT (*)' + fields + ' FROM ' + table
+    if not filters == None:
+      request += ' WHERE ' + filters
+    c.execute(request)
+    result = c.fetchall()
+  except sqlite3.Error as e:
+    return 'Error: ' + str(e) 
+  finally:
+    if conn:
+      conn.close()
+  return result[0][0]
+
+def add_many_records_to_db(table:str, fields_arr:list):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record
       'fields_arr' is a array of 'fields' arrs '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
 
@@ -94,8 +115,9 @@ def add_many_records_to_db(db_filename:str, table:str, fields_arr:list):
       conn.close()
   return result
 
-def add_record_to_db(db_filename:str, table:str, fields: dict):
+def add_record_to_db(table:str, fields: dict):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
     field_names = ''
@@ -127,8 +149,9 @@ def add_record_to_db(db_filename:str, table:str, fields: dict):
       conn.close()
   return result
 
-def del_records_from_db(db_filename:str, table:str, filters:dict):
+def del_records_from_db(table:str, filters:dict):
   ''' Delete records from any table in db by filters '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
@@ -144,8 +167,9 @@ def del_records_from_db(db_filename:str, table:str, filters:dict):
       conn.close()
   return result
 
-def update_records_in_db(db_filename:str, table:str, new_data:str, filters:str):
+def update_records_in_db(table:str, new_data:str, filters:str):
   ''' Update records in db by filters '''
+  db_filename = funcs.read_config_file("configs/config.yaml")["db_filename"]
   try:
     request_template = 'UPDATE {tbl} SET {data} WHERE {fltrs}'
     conn = sqlite3.connect(db_filename)

@@ -2,10 +2,10 @@ import db_handler as db
 import datetime
 from matplotlib import pyplot as plt
 import yaml
-
 import os, os.path
-
 from io import BytesIO
+import keyboards as kb
+import random
 
 help_msg = '''
 This bot messages you once a random time to get you out of tiktok addiction or any other useless activities
@@ -30,7 +30,6 @@ def read_config_file(filename:str):
                 print(f"ERROR: {filename} is corrupted")
                 exit(1)
     return config
-
 
 def get_help_msg():
   ''' Just return help msg '''
@@ -91,9 +90,21 @@ def make_rec_readable(rec):
   ''' Make readable line with record info '''
   line_template = 'id = {id}\n' \
                   'date UTC: {date}\n' \
-                  'happiness: {happiness} {measure}\n' \
+                  'happiness: {happiness}\n' \
                   'comment: {comment}'
 
   line = line_template.format(id=rec.id, date=datetime.datetime.utcfromtimestamp(rec.date_ts).strftime('%Y-%m-%d %H:%M:%S'),
                               happiness=rec.happiness, comment=rec.comment )
   return line
+
+def send_messages():
+  active_users = db.get_active_users()
+  print(active_users)
+
+def get_random_msg(user_id:int):
+  messages = db.get_curr_settings(user_id)[4].split(',')
+  return str(random.choice(messages)).strip("'")
+
+def get_random_interval(user_id:int):
+  max_interval = db.get_curr_settings(user_id)[3]
+  return int(random.randint(int(max_interval/10), max_interval))
