@@ -7,5 +7,6 @@ Commands:
 start - start bot with default settings 
 setup - change settings
 now - send message now
+cancel - cancel current action and return to default state
 stop - stop sending messages
 ```
