@@ -1,6 +1,6 @@
 bot:
   token: ""
-  sending_loop_timeout_sec: 20
+  schedule_loop_timeout_sec: 20
 user:
   default_send_period_sec: 7200
 server:

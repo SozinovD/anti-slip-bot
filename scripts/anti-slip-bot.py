@@ -119,7 +119,7 @@ def main():
 
 def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: AsyncIOScheduler):
     ''' Schedule messages, runs in loop '''
-    loop.call_later(config['bot']['sending_loop_timeout_sec'], message_schedule_loop, loop, scheduler)
+    loop.call_later(config['bot']['schedule_loop_timeout_sec'], message_schedule_loop, loop, scheduler)
     active_users = db.get_active_user_ids()
     curr_ts = int(datetime.timestamp(datetime.now()))
     for user_id in active_users:
