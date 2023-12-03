@@ -41,13 +41,14 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
-    ''' Show help msg at start '''
-    db.add_def_settings(message.from_user.id, config['bot']['default_send_period_sec'])
+    ''' Show help msg at start, write default settings for new users'''
+    db.add_def_settings(message.from_user.id, config['user']['default_send_period_sec'])
     db.change_setting(message.from_user.id, 'send_messages', 1)
     await message.answer(funcs.get_help_msg())
 
 @dp.message_handler(commands="setup")
 async def setup(message: types.Message):
+    ''' Menu for changing settings '''
     await Form.settings.set()
     await message.answer(f"Choose setting to change, current: \
                          {db.get_curr_settings(message.from_user.id, True)}", 
@@ -59,17 +60,20 @@ async def now(message: types.Message):
 
 @dp.message_handler(commands="stop")
 async def stop(message: types.Message):
+    ''' Set "send_messages" to 0, so user won't get new messages '''
     db.change_setting(message.from_user.id, 'send_messages', False)
     await message.answer("New messages will not be scheduled untill you /start bot again")
 
 @dp.callback_query_handler(Text('set_tz'), state=Form.settings)
 async def set_tz(callback: types.CallbackQuery):
+    ''' Change context, so handler of timezone change will catch next message '''
     await Form.tz.set()
     line = 'Send your timezone\n+6 or 6 means UTC+6\n-2 means UTC-2'
     await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
 
 @dp.message_handler(state=Form.tz)
 async def set_tz(message: types.Message, state: FSMContext):
+    ''' Set new timezone '''
     tz = 0
     if message.text[0] == '+': tz = message.text[1:]
     else: tz = message.text
@@ -99,7 +103,8 @@ async def set_msg_txt(callback: types.CallbackQuery):
     await Form.msg_txt.set()
     print('msg_txt')
 
-async def send_message(user_id:int):
+async def send_scheduled_message(user_id:int):
+    ''' Send scheduled message with needed args '''
     await bot.send_message(user_id, funcs.get_random_msg(user_id), reply_markup=kb.hapiness())
 
 def main():
@@ -109,15 +114,15 @@ def main():
     loop = asyncio.get_event_loop()
     scheduler = AsyncIOScheduler()
     scheduler.start()
-    loop.call_later(10, sending_loop, loop, scheduler)
+    message_schedule_loop(loop, scheduler)
     executor.start_polling(dp)
 
-def sending_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: AsyncIOScheduler):
-    loop.call_later(config['bot']['sending_loop_timeout_sec'], sending_loop, loop, scheduler)
+def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: AsyncIOScheduler):
+    ''' Schedule messages, runs in loop '''
+    loop.call_later(config['bot']['sending_loop_timeout_sec'], message_schedule_loop, loop, scheduler)
     active_users = db.get_active_user_ids()
     curr_ts = int(datetime.timestamp(datetime.now()))
     for user_id in active_users:
-        user_id = user_id[0]
         next_window_start_ts = db.get_next_window_start_ts(user_id)
         if next_window_start_ts == 0:
             print('Write new ts:', curr_ts)
@@ -129,7 +134,7 @@ def sending_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: Asy
                                                       tz=timezone(timedelta(hours=config['server']['timezone']
                                                                             ))).strftime('%Y-%m-%d %H:%M:%S')
             print(f'Message to "{user_id}" will be sent at: {nex_msg_date}')
-            scheduler.add_job(send_message, 'date', run_date=nex_msg_date, args=(user_id,))
+            scheduler.add_job(send_scheduled_message, 'date', run_date=nex_msg_date, args=(user_id,))
             db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_curr_settings(user_id)['period']))
 
 if __name__ == "__main__":

@@ -31,20 +31,19 @@ class Record:
   def set_comment(self, comment: str):
     self.comment = str(comment)
 
-  def get_arr(self):
-    arr = []
-    arr.append(['user_id', int(self.user_id)])
-    arr.append(['date_ts', int(self.date_ts)])
-    arr.append(['happiness', float(self.happiness)])
-    arr.append(['comment', self.comment])
-    return arr
+  def get_dict(self):
+    dict = dict()
+    dict['user_id'] = int(self.user_id)
+    dict['date_ts'] = int(self.date_ts)
+    dict['happiness'] = int(self.happiness)
+    dict['comment'] = int(self.comment)
+    return dict
 
-  def get_obj_from_arr(self, arr):
+  def get_obj_from_dict(self, dict):
     obj = Record()
-    # print('get_obj_from_arr:', arr)
-    obj.set_id(arr[0])
-    obj.set_user_id(arr[1])
-    obj.set_date_ts(arr[2])
-    obj.set_happiness(arr[3])
-    obj.set_comment(arr[4])
+    obj.set_id(dict['id'])
+    obj.set_user_id(dict['user_id'])
+    obj.set_date_ts(dict['date_ts'])
+    obj.set_happiness(dict['happiness'])
+    obj.set_comment(dict['comment'])
     return obj

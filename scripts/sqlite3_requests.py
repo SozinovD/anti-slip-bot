@@ -74,35 +74,34 @@ def count(table:str, fields:str='*', filters:str=None):
       conn.close()
   return result[0][0]
 
-def add_many_records_to_db(table:str, fields_arr:list):
+def add_many_records_to_db(table:str, fields_list:list):
   ''' fields is an array of arrys: [field_name, value] is one key=value pair in record
-      'fields_arr' is a array of 'fields' arrs '''
+      'fields_list' is a array of 'fields' arrs '''
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
 
-    for fields in fields_arr:
+    for fields_dict in fields_list:
       field_names = ''
       question_marks = ''
-      values = ''
+      values = list()
       conn = sqlite3.connect(db_filename)
       c = conn.cursor()
-      for counter, field in enumerate(fields):
-        field_names += field[0]
+      for counter, field in enumerate(fields_dict.keys()):
+        field_names += field
         question_marks += '?'
-        values += str(field[1])
-        if counter == len(fields) - 1:
+        values.append(str(fields_dict[field]))
+        if counter == len(fields_dict.keys()) - 1:
           break
         field_names += ', '
         question_marks += ','
-        values +='`'
-      values = tuple(values.split('`'))
+      values = tuple(values)
 
       request = request_template.format(tbl_name=table, flds=field_names, qstn_marks=question_marks)
       c.execute(request, (values))
       result = conn.commit()
 
     if result == None:
-      result = fields_arr
+      result = fields_list
   except sqlite3.Error as e:
     return 'Error: ' + str(e) 
   finally:
@@ -110,32 +109,31 @@ def add_many_records_to_db(table:str, fields_arr:list):
       conn.close()
   return result
 
-def add_record_to_db(table:str, fields: dict):
-  ''' fields is an array of arrys: [field_name, value] is one key=value pair in record '''
+def add_record_to_db(table:str, fields_dict: dict):
+  ''' fields dict: [field_name] = value is one key=value pair in record '''
   try:
     request_template = 'INSERT INTO {tbl_name} ({flds}) VALUES ({qstn_marks})'
     field_names = ''
     question_marks = ''
-    values = ''
+    values = list()
     conn = sqlite3.connect(db_filename)
     c = conn.cursor()
-    for counter, field in enumerate(fields):
-      field_names += field[0]
+    for counter, field in enumerate(fields_dict.keys()):
+      field_names += field
       question_marks += '?'
-      values += str(field[1])
-      if counter == len(fields) - 1:
+      values.append(str(fields_dict[field]))
+      if counter == len(fields_dict.keys()) - 1:
         break
       field_names += ', '
       question_marks += ','
-      values +='`'
-    values = tuple(values.split('`'))
+    values = tuple(values)
 
     request = request_template.format(tbl_name=table, flds=field_names, qstn_marks=question_marks)
     c.execute(request, (values))
     result = conn.commit()
 
     if result == None:
-      result = fields
+      result = fields_dict
   except sqlite3.Error as e:
     return 'Error: ' + str(e) 
   finally:
@@ -143,7 +141,7 @@ def add_record_to_db(table:str, fields: dict):
       conn.close()
   return result
 
-def del_records_from_db(table:str, filters:dict):
+def del_records_from_db(table:str, filters:str):
   ''' Delete records from any table in db by filters '''
   try:
     conn = sqlite3.connect(db_filename)
