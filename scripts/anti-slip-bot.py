@@ -62,7 +62,7 @@ async def stop(message: types.Message):
     db.change_setting(message.from_user.id, 'send_messages', 0)
     await message.answer("New messages will not be scheduled untill you /start bot again")
 
-@dp.callback_query_handler(Text('set_tz'), state=Form.settings)
+@dp.callback_query_handler(Text('set_tz'))
 async def set_tz(callback: types.CallbackQuery):
     ''' Change context, so handler of timezone change will catch next message '''
     await Form.tz.set()
@@ -86,17 +86,17 @@ async def set_tz(message: types.Message, state: FSMContext):
         await message.answer(f'Should be number (from -12, to 12): {tz}')
     await state.finish()
 
-@dp.callback_query_handler(Text('set_worktime'), state=Form.settings)
+@dp.callback_query_handler(Text('set_worktime'))
 async def set_worktime(callback: types.CallbackQuery):
     await Form.worktime.set()
     print('worktime')
 
-@dp.callback_query_handler(Text('set_period'), state=Form.settings)
+@dp.callback_query_handler(Text('set_period'))
 async def set_period(callback: types.CallbackQuery):
     await Form.period.set()
     print('period')
 
-@dp.callback_query_handler(Text('set_msg_txt'), state=Form.settings)
+@dp.callback_query_handler(Text('set_msg_txt'))
 async def set_msg_txt(callback: types.CallbackQuery):
     await Form.msg_txt.set()
     print('msg_txt')
