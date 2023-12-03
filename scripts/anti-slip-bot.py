@@ -14,8 +14,7 @@ from datetime import datetime, timezone, timedelta
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-class Form(StatesGroup):
-  settings = State()  # Will be represented in storage as 'Form:settings'
+class Form(StatesGroup): # Will be represented in storage as 'Form:state'
   tz = State()
   worktime = State()
   period = State()
@@ -49,7 +48,6 @@ async def show_help(message: types.Message):
 @dp.message_handler(commands="setup")
 async def setup(message: types.Message):
     ''' Menu for changing settings '''
-    await Form.settings.set()
     await message.answer(f"Choose setting to change, current: \
                          {db.get_curr_settings(message.from_user.id, True)}", 
                            reply_markup=kb.setup())
