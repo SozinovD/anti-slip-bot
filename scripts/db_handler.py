@@ -52,6 +52,7 @@ def get_curr_settings(user_id:int, human_readable:bool = False):
 - Work time: {settings_dict['worktime']}
 - Period (minutes): {int(settings_dict['period']/60)}
 - Messages: {settings_dict['messages']}
+/cancel to exit settings
   '''
   else: return settings_dict
 

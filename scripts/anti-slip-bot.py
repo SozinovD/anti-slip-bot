@@ -61,7 +61,7 @@ async def now(message: types.Message):
 @dp.message_handler(commands="stop")
 async def stop(message: types.Message):
     ''' Set "send_messages" to 0, so user won't get new messages '''
-    db.change_setting(message.from_user.id, 'send_messages', False)
+    db.change_setting(message.from_user.id, 'send_messages', 0)
     await message.answer("New messages will not be scheduled untill you /start bot again")
 
 @dp.callback_query_handler(Text('set_tz'), state=Form.settings)
@@ -107,16 +107,6 @@ async def send_scheduled_message(user_id:int):
     ''' Send scheduled message with needed args '''
     await bot.send_message(user_id, funcs.get_random_msg(user_id), reply_markup=kb.hapiness())
 
-def main():
-    db_started = db.start()
-    print('Start db:', db_started)
-
-    loop = asyncio.get_event_loop()
-    scheduler = AsyncIOScheduler()
-    scheduler.start()
-    message_schedule_loop(loop, scheduler)
-    executor.start_polling(dp)
-
 def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: AsyncIOScheduler):
     ''' Schedule messages, runs in loop '''
     loop.call_later(config['bot']['schedule_loop_timeout_sec'], message_schedule_loop, loop, scheduler)
@@ -136,6 +126,16 @@ def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, sched
             print(f'Message to "{user_id}" will be sent at: {nex_msg_date}')
             scheduler.add_job(send_scheduled_message, 'date', run_date=nex_msg_date, args=(user_id,))
             db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_curr_settings(user_id)['period']))
+
+def main():
+    db_started = db.start()
+    print('Start db:', db_started)
+
+    loop = asyncio.get_event_loop()
+    scheduler = AsyncIOScheduler()
+    scheduler.start()
+    message_schedule_loop(loop, scheduler)
+    executor.start_polling(dp)
 
 if __name__ == "__main__":
     main()
