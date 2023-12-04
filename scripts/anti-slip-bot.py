@@ -49,7 +49,7 @@ async def show_help(message: types.Message):
 async def setup(message: types.Message):
     ''' Menu for changing settings '''
     await message.answer(f"Choose setting to change, current: \
-                         {db.get_curr_settings(message.from_user.id, True)}", 
+                         {funcs.get_curr_settings(message.from_user.id)}", 
                            reply_markup=kb.setup())
 
 @dp.message_handler(commands="now")
@@ -123,7 +123,7 @@ def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, sched
                                                                             ))).strftime('%Y-%m-%d %H:%M:%S')
             print(f'Message to "{user_id}" will be sent at: {nex_msg_date}')
             scheduler.add_job(send_scheduled_message, 'date', run_date=nex_msg_date, args=(user_id,))
-            db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_curr_settings(user_id)['period']))
+            db.change_setting(user_id, 'next_window_start_ts', curr_ts + int(db.get_user_settings(user_id)['period']))
 
 def main():
     db_started = db.start()

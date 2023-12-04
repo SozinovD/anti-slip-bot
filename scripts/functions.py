@@ -108,3 +108,13 @@ def get_random_msg(user_id:int):
 def get_random_interval(user_id:int):
   max_interval = db.get_curr_settings(user_id)['period']
   return int(random.randint(int(max_interval/10), max_interval))
+
+def get_curr_settings(user_id:int):
+  settings_dict = db.get_user_settings(user_id)
+  return f'''
+- Send messages(0/1): {settings_dict['send_msg']}
+- Timezone: {settings_dict['tz']}
+- Work time: {settings_dict['worktime']}
+- Period (minutes): {int(settings_dict['period']/60)}
+- Messages: {settings_dict['messages']}
+  '''

@@ -39,22 +39,14 @@ def get_next_window_start_ts(user_id:int):
   ''' Return start of next "window for message" for this user '''
   return int(db_requests.select('settings', 'next_window_start_ts', f'user_id={user_id}')[0][0])
 
-def get_curr_settings(user_id:int, human_readable:bool = False):
+def get_user_settings(user_id:int):
   settings = list(db_requests.select("settings", filters=f"user_id={user_id}")[0])[2:]
   settings_dict = {'send_msg': settings[0],
                    'tz': settings[1],
                    'worktime': settings[2],
                    'period': settings[3],
                    'messages': settings[4]}
-  if human_readable: return f'''
-- Send messages(0/1): {settings_dict['send_msg']}
-- Timezone: {settings_dict['tz']}
-- Work time: {settings_dict['worktime']}
-- Period (minutes): {int(settings_dict['period']/60)}
-- Messages: {settings_dict['messages']}
-/cancel to exit settings
-  '''
-  else: return settings_dict
+  return settings_dict
 
 def add_rec(new_rec:Record):
   ''' Add new record to db, return result '''
