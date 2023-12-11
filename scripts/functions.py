@@ -109,7 +109,7 @@ def get_all_msg(user_id:int):
   messages = db.get_user_settings(user_id)['messages'].split('/')
   line = str()
   for msg in messages:
-     line += msg + "\n"
+    line += msg + "\n"
   return line
 
 def get_random_interval(user_id:int):
