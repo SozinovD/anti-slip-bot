@@ -60,7 +60,7 @@ async def now(message: types.Message):
 async def stop(message: types.Message):
     ''' Set "send_messages" to 0, so user won't get new messages '''
     db.change_setting(message.from_user.id, 'send_messages', 0)
-    await message.answer("New messages will not be scheduled untill you /start bot again")
+    await message.answer("New messages will not be scheduled until you /start bot again")
 
 @dp.callback_query_handler(Text('set_tz'))
 async def set_tz(callback: types.CallbackQuery):
