@@ -49,7 +49,7 @@ async def show_help(message: types.Message):
 async def setup(message: types.Message):
     ''' Menu for changing settings '''
     await message.answer(f"Choose setting to change, current: \
-                         {funcs.get_curr_settings(message.from_user.id)}", 
+                         {funcs.get_user_settings(message.from_user.id)}", 
                            reply_markup=kb.setup())
 
 @dp.message_handler(commands="now")
