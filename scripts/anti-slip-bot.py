@@ -54,7 +54,7 @@ async def setup(message: types.Message):
 
 @dp.message_handler(commands="now")
 async def now(message: types.Message):
-    send_scheduled_message(message.from_user.id)
+    await send_scheduled_message(message.from_user.id)
 
 @dp.message_handler(commands="stop")
 async def stop(message: types.Message):
