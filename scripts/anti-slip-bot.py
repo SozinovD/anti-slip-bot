@@ -129,7 +129,7 @@ async def set_msg_txt(callback: types.CallbackQuery):
 async def set_msg_txt(message: types.Message, state: FSMContext):
     ''' Set new messages '''
     res = funcs.set_new_messages(message.from_user.id, message.text)
-    if len(res) != 0:
+    if res != None:
         await message.answer(res + " or type /cancel")
     else:
         await message.answer("New messages are set")
