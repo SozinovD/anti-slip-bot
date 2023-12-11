@@ -29,7 +29,7 @@ def setup():
   btn_list.append(['Message text', 'set_msg_txt'])
   return get_btns_in_rows(2, btn_list)
 
-def hapiness():
+def happiness():
   btn_list = list()
   for n in range(1,11):
     btn_list.append([n, f'happy_{n}'])

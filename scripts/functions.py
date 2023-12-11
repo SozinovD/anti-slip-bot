@@ -102,8 +102,15 @@ def send_messages():
   print(active_users)
 
 def get_random_msg(user_id:int):
-  messages = db.get_curr_settings(user_id)['messages'].split(',')
+  messages = db.get_curr_settings(user_id)['messages'].split('/')
   return str(random.choice(messages)).strip("'")
+
+def get_all_msg(user_id:int):
+  messages = db.get_curr_settings(user_id)['messages'].split('/')
+  line = str()
+  for msg in messages:
+     line += msg + "\n"
+  return line
 
 def get_random_interval(user_id:int):
   max_interval = db.get_curr_settings(user_id)['period']
@@ -116,5 +123,5 @@ def get_curr_settings(user_id:int):
 - Timezone: {settings_dict['tz']}
 - Work time: {settings_dict['worktime']}
 - Period (minutes): {int(settings_dict['period']/60)}
-- Messages: {settings_dict['messages']}
+- Messages:\n{get_all_msg(user_id)}
   '''

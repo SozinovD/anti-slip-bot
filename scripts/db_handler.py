@@ -7,6 +7,10 @@ from datetime import datetime
 import sqlite3_requests as db_requests
 import time
 
+messages_list = { "Как настроение?", "Что ты сейчас хочешь?", "Может, пора поесть?", "Ты устал?", 
+                 "Хочешь переключиться?", "Может, пришло время сделать паузу?", "Тело в порядке?"
+                 }
+
 def start():
   ''' Connect to db, create if it doesn't exist, return conn obj '''
   return db_requests.check_init()
@@ -16,12 +20,15 @@ def add_def_settings(user_id:int, period_sec:int):
   if db_requests.count("settings", 'user_id', f'user_id={user_id}') != 0:
     print("User already exists")
     return
+  messages_str = str()
+  for line in messages_list:
+    messages_str += line + "/"
   def_settings = {"user_id": user_id,
                   "send_messages": 1,
                   "tz": "6",
                   "period_sec": period_sec,
                   "worktime": "9-23",
-                  "messages": "'What are you doing now and how do you feel?'",
+                  "messages": messages_str,
                   "next_window_start_ts": 0}
   db_requests.add_record_to_db('settings', def_settings)
 

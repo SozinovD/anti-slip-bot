@@ -103,7 +103,8 @@ async def set_msg_txt(callback: types.CallbackQuery):
 
 async def send_scheduled_message(user_id:int):
     ''' Send scheduled message with needed args '''
-    await bot.send_message(user_id, funcs.get_random_msg(user_id), reply_markup=kb.hapiness())
+    # await bot.send_message(user_id, funcs.get_random_msg(user_id), reply_markup=kb.happiness())
+    await bot.send_message(user_id, funcs.get_random_msg(user_id))
 
 def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, scheduler: AsyncIOScheduler):
     ''' Schedule messages, runs in loop '''
