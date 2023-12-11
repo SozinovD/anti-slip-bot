@@ -97,16 +97,18 @@ def make_rec_readable(rec):
                               happiness=rec.happiness, comment=rec.comment )
   return line
 
-def send_messages():
-  active_users = db.get_active_users()
-  print(active_users)
-
 def get_random_msg(user_id:int):
-  messages = db.get_user_settings(user_id)['messages'].split('/')
-  return str(random.choice(messages)).strip("'")
+  messages = db.get_msg_list(user_id)
+  result = ""
+  c = 0   # counter, protection from infinite loop
+  while len(result) < 1:
+    result = str(random.choice(messages)).strip("'")
+    c += 1
+    if c > 5: return "ERROR: Couldn't choose message, check settings"
+  return result
 
-def get_all_msg(user_id:int):
-  messages = db.get_user_settings(user_id)['messages'].split('/')
+def get_all_msg_readable(user_id:int):
+  messages = db.get_msg_list(user_id)
   line = str()
   for msg in messages:
     line += msg + "\n"
@@ -116,12 +118,17 @@ def get_random_interval(user_id:int):
   max_interval = db.get_user_settings(user_id)['period']
   return int(random.randint(int(max_interval/10), max_interval))
 
-def get_user_settings(user_id:int):
+def get_user_settings_readable(user_id:int):
   settings_dict = db.get_user_settings(user_id)
   return f'''
 - Send messages(0/1): {settings_dict['send_msg']}
 - Timezone: {settings_dict['tz']}
 - Work time: {settings_dict['worktime']}
 - Period (minutes): {int(settings_dict['period']/60)}
-- Messages:\n{get_all_msg(user_id)}
-  '''
+- Messages will be shown if you want to change them'''
+
+def set_new_messages(user_id:int, msg_str:str):
+  msg_list = msg_str.split("\n")
+  if len(msg_list) < 3:
+     return "Set at least 2 messages"
+  return db.set_msg_list(user_id, msg_list)

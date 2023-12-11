@@ -3,6 +3,10 @@ bot:
   schedule_loop_timeout_sec: 20
 user:
   default_send_period_sec: 7200
+  default_messages:
+    - "How do you feel?"
+    - "Do you want to rest?"
+    - "Are you hungry?"
 server:
   timezone: 3
   db_filename: "main.db"

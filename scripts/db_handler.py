@@ -5,34 +5,41 @@ from datetime import datetime
 import sqlite3_requests as db_requests
 import time
 
-messages_list = { "Как настроение?", "Что ты сейчас хочешь?", "Может, пора поесть?", "Ты устал?", 
-                 "Хочешь переключиться?", "Может, пришло время сделать паузу?", "Тело в порядке?"
-                 }
-
 def start():
   ''' Connect to db, create if it doesn't exist, return conn obj '''
   return db_requests.check_init()
 
-def add_def_settings(user_id:int, period_sec:int):
+def add_def_settings(user_id:int, period_sec:int, default_messages_list:list, divider:str = "//"):
   ''' Add default settings for new user '''
   if db_requests.count("settings", 'user_id', f'user_id={user_id}') != 0:
     print("User already exists")
     return
-  messages_str = str()
-  for line in messages_list:
-    messages_str += line + "/"
+  msg_str = str()
+  for line in default_messages_list:
+    msg_str += line + divider
+  msg_str = msg_str.rstrip(divider)
   def_settings = {"user_id": user_id,
                   "send_messages": 1,
                   "tz": "6",
                   "period_sec": period_sec,
                   "worktime": "9-23",
-                  "messages": messages_str,
+                  "messages": msg_str,
                   "next_window_start_ts": 0}
   db_requests.add_record_to_db('settings', def_settings)
 
+def get_msg_list(user_id:int, divider:str = "//"):
+  ''' Get messages list by user_id '''
+  return get_user_settings(user_id)['messages'].split(divider)
+
+def set_msg_list(user_id:int, msg_list:list, divider:str = "//"):
+  msg_str = str()
+  for msg in msg_list:
+    msg_str += msg + divider
+  print(change_setting(user_id, "messages", msg_str))
+
 def change_setting(user_id:int, set_name:str, set_val):
   ''' Change one setting for this user '''
-  return db_requests.update_records_in_db("settings", f'{set_name}={set_val}', f'user_id={user_id}')
+  return db_requests.update_records_in_db("settings", f'{set_name}="{set_val}"', f'user_id={user_id}')
 
 def get_active_user_ids():
   ''' Returns users that have 1 in "send_messages" field '''

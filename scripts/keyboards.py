@@ -26,7 +26,7 @@ def setup():
   btn_list.append(['Timezone', 'set_tz'])
   btn_list.append(['Worktime', 'set_worktime'])
   btn_list.append(['Period', 'set_period'])
-  btn_list.append(['Message text', 'set_msg_txt'])
+  btn_list.append(['Messages texts', 'set_msg_txt'])
   return get_btns_in_rows(2, btn_list)
 
 def happiness():

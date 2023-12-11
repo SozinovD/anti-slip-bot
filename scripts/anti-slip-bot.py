@@ -41,7 +41,8 @@ async def cancel_handler(message: types.Message, state: FSMContext):
 @dp.message_handler(commands="start")
 async def show_help(message: types.Message):
     ''' Show help msg at start, write default settings for new users'''
-    db.add_def_settings(message.from_user.id, config['user']['default_send_period_sec'])
+    db.add_def_settings(message.from_user.id, config['user']['default_send_period_sec'],
+                         config['user']['default_messages'])
     db.change_setting(message.from_user.id, 'send_messages', 1)
     await message.answer(funcs.get_help_msg())
 
@@ -49,8 +50,7 @@ async def show_help(message: types.Message):
 async def setup(message: types.Message):
     ''' Menu for changing settings '''
     await message.answer(f"Choose setting to change, current: \
-                         {funcs.get_user_settings(message.from_user.id)}", 
-                           reply_markup=kb.setup())
+                         {funcs.get_user_settings_readable(message.from_user.id)}", reply_markup=kb.setup())
 
 @dp.message_handler(commands="now")
 async def now(message: types.Message):
@@ -88,18 +88,52 @@ async def set_tz(message: types.Message, state: FSMContext):
 
 @dp.callback_query_handler(Text('set_worktime'))
 async def set_worktime(callback: types.CallbackQuery):
+    line = 'Send bot worktime\n9-23 means it starts at 9:00, ends 23:00 according to your timezone'
+    await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
     await Form.worktime.set()
-    print('worktime')
+
+@dp.message_handler(state=Form.worktime)
+async def set_worktime(message: types.Message, state: FSMContext):
+    ''' Set new worktime '''
+    wt = message.text
+    await message.answer(f"New worktime is set: '{wt}'")
+    db.change_setting(message.from_user.id, 'worktime', wt)
+    await state.finish()
 
 @dp.callback_query_handler(Text('set_period'))
 async def set_period(callback: types.CallbackQuery):
+    line = 'Send period to send messages in minutes\n120 means they will be sent in some time every 120 minutes'
+    await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
     await Form.period.set()
-    print('period')
+
+@dp.message_handler(state=Form.period)
+async def set_period(message: types.Message, state: FSMContext):
+    ''' Set new messaging period '''
+    try:
+        pd = int(message.text)
+        await message.answer(f"New worktime is set: '{pd}' minutes")
+        db.change_setting(message.from_user.id, 'period_sec', pd*60)
+    except Exception:
+        await message.answer("Invalid period, it should be just number of minutes, nothing else")
+    await state.finish()
 
 @dp.callback_query_handler(Text('set_msg_txt'))
 async def set_msg_txt(callback: types.CallbackQuery):
     await Form.msg_txt.set()
-    print('msg_txt')
+    line = "Send every message in new line, current are:"
+    await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
+    await bot.send_message(callback.from_user.id, funcs.get_all_msg_readable(callback.from_user.id),
+                            parse_mode="Markdown")
+
+@dp.message_handler(state=Form.msg_txt)
+async def set_msg_txt(message: types.Message, state: FSMContext):
+    ''' Set new messages '''
+    res = funcs.set_new_messages(message.from_user.id, message.text)
+    if len(res) != 0:
+        await message.answer(res + " or type /cancel")
+    else:
+        await message.answer("New messages are set")
+        await state.finish()
 
 async def send_scheduled_message(user_id:int):
     ''' Send scheduled message with needed args '''
