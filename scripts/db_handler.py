@@ -1,9 +1,7 @@
 from classes import Record
 
 import time
-from datetime import datetime
 import sqlite3_requests as db_requests
-import time
 
 def start():
   ''' Connect to db, create if it doesn't exist, return conn obj '''

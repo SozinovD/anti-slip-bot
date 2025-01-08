@@ -14,15 +14,35 @@ from datetime import datetime, timezone, timedelta
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
+import os
+
 class Form(StatesGroup): # Will be represented in storage as 'Form:state'
   tz = State()
   worktime = State()
   period = State()
   msg_txt = State()
 
-config = funcs.read_config_file("configs/config.yaml")
+config_file = os.getenv("CONFIG_FILE")
+if not config_file:
+    print("Env 'CONFIG_FILE' is empty, use default: 'configs/config.yaml'")
+    config_file = "configs/config.yaml"
+print("CONFIG_FILE:", config_file)
+config = funcs.read_config_file(config_file)
 storage = MemoryStorage()
-bot = Bot(config['bot']["token"])
+
+bot_token = os.getenv("TG_BOT_TOKEN")
+if not bot_token:
+    print("Token not found in 'TG_BOT_TOKEN' env var")
+
+if not bot_token:
+    try:
+        bot_token = config.get("bot").get("token")
+    except:
+        print("Token not found in 'bot.token' section of config, exit")
+        import sys
+        sys.exit(1)
+
+bot = Bot(bot_token)
 dp = Dispatcher(bot, storage=storage)
 
 # data_divider_in_callback = "`"

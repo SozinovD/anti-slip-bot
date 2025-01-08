@@ -1,6 +1,4 @@
-import db_handler as db
 from aiogram import types
-from datetime import datetime
 
 def back_to_start_btn(divider:str):
   ''' Return btn with callback data that tells to go to start '''

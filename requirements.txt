@@ -1,5 +1,7 @@
 aiogram == 2.25.1
 aiogram_dialog == 1.9.0
+apscheduler == 3.10.4
 config
 pyyaml
 apscheduler
+matplotlib

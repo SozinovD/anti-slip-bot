@@ -32,7 +32,7 @@ class Record:
     self.comment = str(comment)
 
   def get_dict(self):
-    dict = dict()
+    dict = {}
     dict['user_id'] = int(self.user_id)
     dict['date_ts'] = int(self.date_ts)
     dict['happiness'] = int(self.happiness)
