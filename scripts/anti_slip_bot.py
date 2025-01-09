@@ -83,7 +83,7 @@ async def stop(message: types.Message):
     await message.answer("New messages will not be scheduled until you /start bot again")
 
 @dp.callback_query_handler(Text('set_tz'))
-async def set_tz(callback: types.CallbackQuery):
+async def set_tz_form(callback: types.CallbackQuery):
     ''' Change context, so handler of timezone change will catch next message '''
     await Form.tz.set()
     line = 'Send your timezone\n+6 or 6 means UTC+6\n-2 means UTC-2'
@@ -93,8 +93,10 @@ async def set_tz(callback: types.CallbackQuery):
 async def set_tz(message: types.Message, state: FSMContext):
     ''' Set new timezone '''
     tz = 0
-    if message.text[0] == '+': tz = message.text[1:]
-    else: tz = message.text
+    if message.text[0] == "+":
+        tz = message.text[1:]
+    else:
+        tz = message.text
     try:
         tz = int(tz)
         if tz > 12 or tz < -12:
@@ -107,7 +109,7 @@ async def set_tz(message: types.Message, state: FSMContext):
     await state.finish()
 
 @dp.callback_query_handler(Text('set_worktime'))
-async def set_worktime(callback: types.CallbackQuery):
+async def set_worktime_form(callback: types.CallbackQuery):
     line = 'Send bot worktime\n9-23 means it starts at 9:00, ends 23:00 according to your timezone'
     await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
     await Form.worktime.set()
@@ -121,7 +123,7 @@ async def set_worktime(message: types.Message, state: FSMContext):
     await state.finish()
 
 @dp.callback_query_handler(Text('set_period'))
-async def set_period(callback: types.CallbackQuery):
+async def set_period_form(callback: types.CallbackQuery):
     line = 'Send period to send messages in minutes\n120 means they will be sent in some time every 120 minutes'
     await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
     await Form.period.set()
@@ -138,7 +140,7 @@ async def set_period(message: types.Message, state: FSMContext):
     await state.finish()
 
 @dp.callback_query_handler(Text('set_msg_txt'))
-async def set_msg_txt(callback: types.CallbackQuery):
+async def set_msg_txt_form(callback: types.CallbackQuery):
     await Form.msg_txt.set()
     line = "Send every message in new line, current are:"
     await bot.send_message(callback.from_user.id, line, parse_mode="Markdown")
@@ -149,7 +151,8 @@ async def set_msg_txt(callback: types.CallbackQuery):
 async def set_msg_txt(message: types.Message, state: FSMContext):
     ''' Set new messages '''
     res = funcs.set_new_messages(message.from_user.id, message.text)
-    if res == None: res = ""
+    if res is None:
+        res = ""
     if len(res) != 0:
         await message.answer(res + " or type /cancel")
     else:
@@ -175,7 +178,7 @@ def message_schedule_loop(loop:asyncio.unix_events._UnixSelectorEventLoop, sched
         if next_window_start_ts < curr_ts:
             next_msg_interval = funcs.get_random_interval(user_id)
             nex_msg_date = datetime.fromtimestamp(curr_ts + next_msg_interval,
-                                                      tz=timezone(timedelta(hours=config['server']['timezone']
+                                                      tz=timezone(timedelta(hours=int(os.getenv("TIMEZONE", default=0))
                                                                             ))).strftime('%Y-%m-%d %H:%M:%S')
             print(f'Message to "{user_id}" will be sent at: {nex_msg_date}')
             scheduler.add_job(send_scheduled_message, 'date', run_date=nex_msg_date, args=(user_id,))

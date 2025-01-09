@@ -5,6 +5,11 @@ Telegram token can be provided:
 - by env var `TG_BOT_TOKEN` (priority)
 - in config file, section `bot.token`
 
+Env vars used:
+- `TG_BOT_TOKEN`
+- `CONFIG_FILE`
+- `TIMEZONE`
+
 Commands:
 
 ```

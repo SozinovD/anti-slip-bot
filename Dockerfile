@@ -1,10 +1,9 @@
-FROM python:3.11-alpine
+FROM python:3.11.11-alpine
 
 ENV TG_BOT_TOKEN ""
 ENV CONFIG_FILE ""
 
 ADD requirements.txt /tmp
-
 RUN pip install -r /tmp/requirements.txt;
 
 ADD scripts/ /opt/anti_slip_bot/scripts/

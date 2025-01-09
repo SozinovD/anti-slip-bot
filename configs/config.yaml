@@ -8,5 +8,4 @@ user:
     - "Do you want to rest?"
     - "Are you hungry?"
 server:
-  timezone: 3
   db_filename: "main.db"
