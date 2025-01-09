@@ -2,9 +2,9 @@ import db_handler as db
 import datetime
 from matplotlib import pyplot as plt
 import yaml
-import os, os.path
+import os
+import os.path
 from io import BytesIO
-import keyboards as kb
 import random
 
 help_msg = '''

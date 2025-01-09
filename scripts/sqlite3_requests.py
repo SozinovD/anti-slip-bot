@@ -4,7 +4,9 @@ from tables import tables_arr
 
 import functions as funcs
 
-db_filename = funcs.read_config_file("configs/config.yaml")['server']["db_filename"]
+db_filename = os.getenv("DB_FILENAME")
+if not db_filename:
+  db_filename = funcs.read_config_file("configs/config.yaml")['server']["db_filename"]
 
 def check_init():
   ''' Connect to db, create if it doesn't exist, return conn obj '''
