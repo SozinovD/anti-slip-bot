@@ -6,9 +6,10 @@ Telegram token can be provided:
 - in config file, section `bot.token`
 
 Env vars used:
-- `TG_BOT_TOKEN`
-- `CONFIG_FILE`
-- `TIMEZONE`
+- `TG_BOT_TOKEN` - telegram bot token
+- `CONFIG_FILE`  - override default config file (configs/config.yaml)
+- `TIMEZONE`     - override timezone
+- `DB_FILENAME`  - override db filename mentioned in config
 
 Commands:
 
