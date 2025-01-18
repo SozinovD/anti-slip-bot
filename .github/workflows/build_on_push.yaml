@@ -3,7 +3,7 @@ on:
    tags:
      - '!refs/tags/*'
    branches:
-     - 'main'
+     - '*'
 
 jobs:
   build_and_pub:
