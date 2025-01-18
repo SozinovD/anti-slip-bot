@@ -23,5 +23,5 @@ stop - stop sending messages
 To use docker image just type
 
 ```
-docker pull sozinovdm/anti_slilp_bot
+docker pull sozinovdm/anti_slip_bot
 ```
